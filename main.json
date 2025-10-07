@@ -1,0 +1,2757 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "message",
+          "callback_query"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -16,
+        784
+      ],
+      "id": "732b208a-a340-46bd-aff9-4ab6e01487df",
+      "name": "Telegram Trigger",
+      "webhookId": "29461dbf-857b-4e8e-be13-d2ba5f2b4a6d",
+      "credentials": {
+        "telegramApi": {
+          "id": "BrHDcDevn0Qunnwi",
+          "name": "Telegram account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.callback_query }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "object",
+                      "operation": "exists",
+                      "singleValue": true
+                    },
+                    "id": "c3110251-3454-445b-a23e-5aab95de5b16"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "e54f0527-d240-403e-9a7d-fd0d9e33d2fd",
+                    "leftValue": "={{ $json.message }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "object",
+                      "operation": "exists",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        208,
+        784
+      ],
+      "id": "350dcd82-4b9c-496b-b805-6544a5d6260e",
+      "name": "message | callback",
+      "notesInFlow": true,
+      "notes": "word/expression\nor\ncommand to save/regenerate"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $json.user_id }}",
+        "text": "=Saved: {{ $json.value }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        2320,
+        -48
+      ],
+      "id": "048febde-c031-4eb7-bb4c-05136af42cb1",
+      "name": "Send a text message1",
+      "webhookId": "9a81d85e-46a0-4a44-89ca-e980c777e134",
+      "credentials": {
+        "telegramApi": {
+          "id": "BrHDcDevn0Qunnwi",
+          "name": "Telegram account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "insert",
+        "collection": "expression",
+        "fields": "={{ Object.keys($node[\"Prepare expression data to store2\"].json).join(', ') }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.mongoDb",
+      "typeVersion": 1.2,
+      "position": [
+        1680,
+        -48
+      ],
+      "id": "b5166368-b5e2-4b88-a39a-1fe6954d206a",
+      "name": "Insert documents",
+      "credentials": {
+        "mongoDb": {
+          "id": "AHx6Vu0j6A0sxyHq",
+          "name": "MongoDB account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "2fff1911-1efd-4c61-b1e1-086648b4ec99",
+              "leftValue": "={{ $json._id.toJsonString() }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1968,
+        -48
+      ],
+      "id": "46753880-7311-4786-91f0-37be491f5d3d",
+      "name": "If inserted"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  \"user_id\": \"{{ $('Save | regen | grade').item.json.callback_query.from.id }}\",\n  \"value\": \"{{ $('Save | regen | grade').item.json.callback_query.data.slice(5) }}\",\n  \"created_at\": \"{{ new Date($json.callback_query.message.date * 1000).toISOString() }}\",\n  \"last_sent_at\": {{null}},\n  \"last_interaction_at\": {{null}},\n  \"reps\": 0,\n  \"lapses\": 0,\n  \"success_streak\": 0,\n  \"ewma_grade\": 0.0,\n  \"last_grade\": 0,\n  \"pending_message_id\": {{null}},\n  \"status\": \"active\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        656,
+        -240
+      ],
+      "id": "793bd8fc-83f0-40f8-8fa9-5425dbb3743f",
+      "name": "Prepare expression data to store"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  \"user_id\": \"{{ $('Save | regen | grade').item.json.callback_query.from.id }}\",\n  \"last_push_at\": \"{{ new Date($json.callback_query.message.date * 1000).toISOString() }}\",\n  \"has_pending\": {{false}}\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        656,
+        -48
+      ],
+      "id": "811956e6-7516-496d-9504-c716bc0100b0",
+      "name": "prepare user data to store"
+    },
+    {
+      "parameters": {
+        "operation": "findOneAndUpdate",
+        "collection": "users",
+        "updateKey": "user_id",
+        "fields": "user_id, last_push_at, has_pending",
+        "upsert": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.mongoDb",
+      "typeVersion": 1.2,
+      "position": [
+        880,
+        -48
+      ],
+      "id": "97e855ed-8b6d-4c51-a4e5-e57b7f8feeda",
+      "name": "Find and update documents",
+      "credentials": {
+        "mongoDb": {
+          "id": "AHx6Vu0j6A0sxyHq",
+          "name": "MongoDB account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "collection": "expression",
+        "options": {},
+        "query": "={\"_id\": \"{{ $json.callback_query.data.split('-')[1] }}\"} "
+      },
+      "type": "n8n-nodes-base.mongoDb",
+      "typeVersion": 1.2,
+      "position": [
+        656,
+        144
+      ],
+      "id": "0908d4e7-fda6-4fb9-84d6-6ebe96a24ad0",
+      "name": "Find graded expression",
+      "credentials": {
+        "mongoDb": {
+          "id": "AHx6Vu0j6A0sxyHq",
+          "name": "MongoDB account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "language": "python",
+        "pythonCode": "# Add a new field called 'myNewField' to the JSON of the item\nimport datetime as dt\n\nitem = _input.item.json\n\n# ---- CONFIG ----\nALPHA = 0.30          # EWMA smoothing\nPASS_THRESHOLD = 3    # >=3 counts as success\n\nUTC = dt.timezone.utc\n\ndef now_utc():\n    return dt.datetime.now(UTC)\n\ndef iso_z(ts: dt.datetime) -> str:\n    return ts.astimezone(UTC).replace(tzinfo=None).isoformat(timespec=\"seconds\") + \"Z\"\n\ngrade = item.get(\"_grade\") or item.get(\"grade\")\nif grade is None:\n    raise ValueError(\"No grade provided. Put 0..5 in json.grade or json._grade.\")\n\ngrade = float(grade)\nif grade < 0 or grade > 5:\n    raise ValueError(\"Grade must be between 0 and 5.\")\n\ndoc = dict(item)  # copy\n\n# Snapshot before updating\nreps_before = int(doc.get(\"reps\") or 0)\nlapses_before = int(doc.get(\"lapses\") or 0)\nstreak_before = int(doc.get(\"success_streak\") or 0)\newma_before = float(doc.get(\"ewma_grade\") or 0.0)\n\n# Update counters\nis_success = grade >= PASS_THRESHOLD\ndoc[\"reps\"] = reps_before + (1 if is_success else 0)\ndoc[\"lapses\"] = lapses_before + (0 if is_success else 1)\ndoc[\"success_streak\"] = (streak_before + 1) if is_success else 0\n\n# EWMA update\ndoc[\"ewma_grade\"] = round(ALPHA * grade + (1.0 - ALPHA) * ewma_before, 4)\n\n# Other fields\ndoc[\"last_grade\"] = grade\ndoc[\"last_interaction_at\"] = iso_z(now_utc())\ndoc[\"pending_message_id\"] = None  # clear pending\n\n# Return updated document\nreturn doc"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1104,
+        240
+      ],
+      "id": "553a622f-4568-48b6-aa68-2cbf01461927",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "collection": "users",
+        "updateKey": "=user_id",
+        "fields": "has_pending",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.mongoDb",
+      "typeVersion": 1.2,
+      "position": [
+        1104,
+        48
+      ],
+      "id": "b1c8fda6-1c0e-48e9-a094-6dfc46bb4371",
+      "name": "Update user has_pending=false",
+      "credentials": {
+        "mongoDb": {
+          "id": "AHx6Vu0j6A0sxyHq",
+          "name": "MongoDB account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "findOneAndUpdate",
+        "collection": "expression",
+        "updateKey": "_id",
+        "fields": "last_interaction_at, reps, lapses, success_streak, ewma_grade, last_grade, status",
+        "upsert": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.mongoDb",
+      "typeVersion": 1.2,
+      "position": [
+        1392,
+        240
+      ],
+      "id": "c163dd9c-b8cf-450a-9c28-1a2484bc818b",
+      "name": "update expression's grades",
+      "credentials": {
+        "mongoDb": {
+          "id": "AHx6Vu0j6A0sxyHq",
+          "name": "MongoDB account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are a terse Italian vocab helper for Telegram.\n\nGiven this Italian word or expression: \n{{ $('If').item.json.message.text }}\n\nReturn EXACTLY four lines, nothing else:\n\n🇮🇹 Def: [one to two sentence Italian definition at A2/B1 level, pick the most frequent general sense, ≤20 words] [representative emojis if any]\n🇬🇧 EN: [1–2 common English translations]\n🇮🇷 FA: [1–2 common Persian (Farsi) translations]\n🧩 Esempio: \"[everyday Italian sentence using the word]\" ||NORM:[normalized version of the given word or expression]||\n\nNormalization rules for [normalized]:\n- Lowercase; collapse multiple spaces to one; trim ends.\n- Keep slashes “/”, hyphens “-”, accents, apostrophes; do NOT change lemma/tense or slash forms (e.g., “Tavolo/a” → “tavolo/a”).\n- If there are typos, correct the spelling to the intended Italian token **without changing it to another word**.\n\nUnknown/unclear input:\n- If the input seems unknown or ambiguous return EXACTLY the following.\n- Give a brief, polite Italian note like:\n  “Parola non chiara; forse intendevi: X, Y, Z.”\n- If the intention was not clear just write “Parola non chiara”\n- Do NOT add extra lines.\n",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        1328,
+        480
+      ],
+      "id": "e81bf762-95e1-4de8-b28b-02d295dc6823",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        1408,
+        704
+      ],
+      "id": "3fd80251-d2c1-4d11-9364-5106f456c431",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "Q50URkwBWyzgTn0k",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('If').item.json.id }}",
+        "text": "={{ $json.output.split('||NORM:')[0] }}",
+        "replyMarkup": "inlineKeyboard",
+        "inlineKeyboard": {
+          "rows": [
+            {
+              "row": {
+                "buttons": [
+                  {
+                    "text": "✅ Save",
+                    "additionalFields": {
+                      "callback_data": "=Save|{{ ($json.output.match(/\\|\\|NORM:\\s*([\\s\\S]*?)\\|\\|/i) || [])[1]?.trim() || '' }}"
+                    }
+                  },
+                  {
+                    "text": "🔁 Regenerate",
+                    "additionalFields": {
+                      "callback_data": "=regen|{{ ($json.output.match(/\\|\\|NORM:\\s*([\\s\\S]*?)\\|\\|/i) || [])[1]?.trim() || '' }}"
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1968,
+        304
+      ],
+      "id": "d5d9bb56-b73d-415d-a044-a08844b1c33c",
+      "name": "Send a text message",
+      "webhookId": "e613e64b-527b-4f18-8905-7483fd6d6800",
+      "credentials": {
+        "telegramApi": {
+          "id": "BrHDcDevn0Qunnwi",
+          "name": "Telegram account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  \"id\": {{ $json.callback_query.from.id }},\n  \"message\": {\n    \"text\": {{ $('Telegram Trigger').item.json.callback_query.data.slice(6).toJsonString() }}\n  } \n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        656,
+        496
+      ],
+      "id": "d830f3b6-e939-4321-8402-49f8e49065e0",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  \"id\": {{ $('Telegram Trigger').item.json.message.from.id }},\n  \"message\":{\n    \"text\": {{ $json.message.text.toJsonString() }}\n  } \n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        656,
+        688
+      ],
+      "id": "f8188c75-41fc-418b-b21a-1a573395b0ad",
+      "name": "Edit Fields2"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "79069a37-4a5b-47fc-8d6f-7819d299aa52",
+              "leftValue": "={{ $json.id }}",
+              "rightValue": "={{ $json }}",
+              "operator": {
+                "type": "number",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        880,
+        592
+      ],
+      "id": "1445f6a7-750a-45b6-a54d-3dc5ec378fb1",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.message.text }}",
+                    "rightValue": "/",
+                    "operator": {
+                      "type": "string",
+                      "operation": "startsWith"
+                    },
+                    "id": "938182bc-3ee3-4a36-84d4-10d981187c46"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "f2a2c4bd-9006-4c74-b648-ff631209284b",
+                    "leftValue": "={{ $json.message.text.length }}",
+                    "rightValue": 256,
+                    "operator": {
+                      "type": "number",
+                      "operation": "lte"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        432,
+        1216
+      ],
+      "id": "0b7d1239-59c6-4cd6-aa74-ccab6e0e1e31",
+      "name": "command or text"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $json.message.from.id }}",
+        "text": "=👋 Welcome! I’m your Italian learning bot. Here’s how it works:  \n✏️ Send me any Italian word or expression you want to learn.  \n🤖 I’ll reply with translation + explanation.  \n💾 You’ll see two buttons:  \n  Save → add the card to your personal study list.  \n  Regenerate → regenerate the explanation if you want another version.  \n📅 Saved cards will be sent back to you automatically, spaced out for review.  You’ll be asked to rate your familiarity (0–5), and I’ll schedule the next review.\n⚠️ Point: you don't receive new FlashCards (reviews) if you don't rate the previous FlashCard or save a new one.\n✨ That’s it — just start sending words and build your flashcard deck!",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        880,
+        832
+      ],
+      "id": "ff3bd772-1ba5-4865-b5ce-37e6d2f276cf",
+      "name": "start message",
+      "webhookId": "37be9762-7d14-4684-8c38-667ec342a666",
+      "credentials": {
+        "telegramApi": {
+          "id": "BrHDcDevn0Qunnwi",
+          "name": "Telegram account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "collection": "users",
+        "options": {},
+        "query": "={\"user_id\": \"{{ $json.message.from.id }}\"}"
+      },
+      "type": "n8n-nodes-base.mongoDb",
+      "typeVersion": 1.2,
+      "position": [
+        880,
+        1072
+      ],
+      "id": "50842149-7b44-4c1c-a068-3727245a6fd3",
+      "name": "Find documents",
+      "alwaysOutputData": true,
+      "credentials": {
+        "mongoDb": {
+          "id": "AHx6Vu0j6A0sxyHq",
+          "name": "MongoDB account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('start/get/import/list/story').item.json.message.from.id }}",
+        "text": "Sorry but you don't have any memory            (◡︵◡)",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1392,
+        976
+      ],
+      "id": "3d1e7205-2b60-4c80-8f2a-5b3c5a23bd17",
+      "name": "no memory",
+      "webhookId": "078886ec-622b-48d7-9eea-2a25bde1dba3",
+      "credentials": {
+        "telegramApi": {
+          "id": "BrHDcDevn0Qunnwi",
+          "name": "Telegram account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "cb8e1d86-4bfe-4a3e-8870-a641e0de5dc4",
+              "leftValue": "={{ $json.user_id }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1104,
+        1072
+      ],
+      "id": "a8a9a134-a0dd-4d1a-943e-9bd6c8bb3630",
+      "name": "if user in db"
+    },
+    {
+      "parameters": {
+        "language": "python",
+        "pythonCode": "# Loop over input items and add a new field called 'myNewField' to the JSON of each one\nimport datetime\nimport random\n\nUTC = datetime.timezone.utc\n\ndef parse_iso(ts: str):\n    if not ts:\n        return None\n    try:\n        # handle \"...Z\"\n        if ts.endswith(\"Z\"):\n            ts = ts[:-1] + \"+00:00\"\n        dt = datetime.datetime.fromisoformat(ts)\n        # force timezone-aware\n        if dt.tzinfo is None:\n            dt = dt.replace(tzinfo=UTC)\n        return dt\n    except Exception:\n        return None\n\ndef hours_since(dt):\n    if not dt:\n        return 0.0\n    now = datetime.datetime.now(UTC)\n    return max((now - dt).total_seconds() / 3600.0, 0.0)\n\ndef priority(c):\n  # 1) t = hours since last review (last_interaction_at or created_at)\n    last_dt = parse_iso(c.get(\"last_interaction_at\")) or parse_iso(c.get(\"created_at\"))\n    t = hours_since(last_dt)\n    recency = t / (1.0 + t)\n\n    # 2) D = difficulty (from EWMA grade 0..5)\n    ewma = float(c.get(\"ewma_grade\") or 0)\n    D = 1.0 - (ewma / 5.0)\n\n    # 3) S = stability (from success_streak)\n    streak = float(c.get(\"success_streak\") or 0)\n    S = 1.0 / (1.0 + streak)\n\n    # 4) L = lapses (capped at 5)\n    lapses = float(c.get(\"lapses\") or 0)\n    L = min(lapses, 5.0) / 5.0\n\n    # 5) N = novelty (reps==0)\n    reps = int(c.get(\"reps\") or 0)\n    N = 1.0 if reps == 0 else 0.0\n\n    # 6) eps = randomness\n    eps = random.random() * 0.08\n\n    # 7) Final\n    return 0.4*recency + 0.35*D + 0.10*S + 0.05*N + 0.05*L + eps\n\ndocs = []\nfor item in _input.all():\n  item.json.myNewField = 1\n  item.json.priority = priority(item.json)\n  docs.append(item.json)\n\n  if not docs:\n    return []\n\nbest = max(docs, key=lambda d: d[\"priority\"])\n\nprint(_input.all())\nreturn best"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1968,
+        1168
+      ],
+      "id": "a268bcd5-9189-4834-bdee-3012b01b3212",
+      "name": "Priority formula"
+    },
+    {
+      "parameters": {
+        "operation": "findOneAndUpdate",
+        "collection": "users",
+        "updateKey": "user_id",
+        "fields": "user_id, last_push_at, has_pending",
+        "upsert": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.mongoDb",
+      "typeVersion": 1.2,
+      "position": [
+        3056,
+        1072
+      ],
+      "id": "cf00ab6e-253d-4673-ae8d-9dedc413174c",
+      "name": "Find and update user data document",
+      "credentials": {
+        "mongoDb": {
+          "id": "AHx6Vu0j6A0sxyHq",
+          "name": "MongoDB account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "findOneAndUpdate",
+        "collection": "expression",
+        "updateKey": "_id",
+        "fields": "=last_sent_at, pending_message_id",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.mongoDb",
+      "typeVersion": 1.2,
+      "position": [
+        3056,
+        1408
+      ],
+      "id": "398ca3eb-95e2-4c07-81b9-9b04ea15eedd",
+      "name": "Find and update the word document",
+      "credentials": {
+        "mongoDb": {
+          "id": "AHx6Vu0j6A0sxyHq",
+          "name": "MongoDB account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Priority formula').item.json.user_id }}",
+        "text": "=Your picked expression: \"{{ $('Priority formula').item.json.value }}\"\n-----------\n<tg-spoiler>{{ $json.output }}</tg-spoiler>",
+        "replyMarkup": "inlineKeyboard",
+        "inlineKeyboard": {
+          "rows": [
+            {
+              "row": {
+                "buttons": [
+                  {
+                    "text": "=0 - I had no idea",
+                    "additionalFields": {
+                      "callback_data": "=grade-{{ $('Priority formula').item.json._id }}-0"
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "row": {
+                "buttons": [
+                  {
+                    "text": "1",
+                    "additionalFields": {
+                      "callback_data": "=grade-{{ $('Priority formula').item.json._id }}-1"
+                    }
+                  },
+                  {
+                    "text": "2",
+                    "additionalFields": {
+                      "callback_data": "=grade-{{ $('Priority formula').item.json._id }}-2"
+                    }
+                  },
+                  {
+                    "text": "3",
+                    "additionalFields": {
+                      "callback_data": "=grade-{{ $('Priority formula').item.json._id }}-3"
+                    }
+                  },
+                  {
+                    "text": "4",
+                    "additionalFields": {
+                      "callback_data": "=grade-{{ $('Priority formula').item.json._id }}-4"
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "row": {
+                "buttons": [
+                  {
+                    "text": "5 - Known like family",
+                    "additionalFields": {
+                      "callback_data": "=grade-{{ $('Priority formula').item.json._id }}-5"
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "HTML"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        2608,
+        1168
+      ],
+      "id": "afbc91a6-040c-4abc-a530-2f371c21a77d",
+      "name": "Send 'Your picked expression'",
+      "webhookId": "5ec16321-4336-4da6-9e61-2af2161313d2",
+      "retryOnFail": true,
+      "maxTries": 2,
+      "waitBetweenTries": 5000,
+      "credentials": {
+        "telegramApi": {
+          "id": "BrHDcDevn0Qunnwi",
+          "name": "Telegram account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $json.user_id }}",
+        "text": "user updated ✅",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        3280,
+        1072
+      ],
+      "id": "4cc6bd81-6535-4692-b145-51f2e3bdddee",
+      "name": "Send a text message2",
+      "webhookId": "97db1e51-f27a-478f-b0b8-d220949551c8",
+      "credentials": {
+        "telegramApi": {
+          "id": "BrHDcDevn0Qunnwi",
+          "name": "Telegram account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('prepare grade updated messages').item.json.user_id }}",
+        "text": "=doc updated ✅ {{ $('Priority formula').item.json.value }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        3280,
+        1408
+      ],
+      "id": "cd1d843c-626f-47ad-946a-ef6ab5cb98b5",
+      "name": "Send a text message3",
+      "webhookId": "58d8b8af-ffdc-4f86-b2cc-1f184240557f",
+      "credentials": {
+        "telegramApi": {
+          "id": "BrHDcDevn0Qunnwi",
+          "name": "Telegram account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "collection": "expression",
+        "options": {},
+        "query": "={\n  \"user_id\": \"{{ $json.user_id }}\",\n  \"status\": \"active\",\n  \"$and\": [\n    {\n      \"$or\": [\n        { \"last_sent_at\": null },\n        { \"last_sent_at\": { \"$lt\": \"{{new Date(Date.now() - 600*60*1000).toISOString()}}\" } }\n      ]\n    }\n  ]\n}"
+      },
+      "type": "n8n-nodes-base.mongoDb",
+      "typeVersion": 1.2,
+      "position": [
+        1680,
+        1168
+      ],
+      "id": "71680ba1-d0a8-4343-a2aa-563a78668c22",
+      "name": "Find documents1",
+      "credentials": {
+        "mongoDb": {
+          "id": "AHx6Vu0j6A0sxyHq",
+          "name": "MongoDB account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are a terse Italian vocab helper for Telegram.\n\nGiven this Italian word or expression: {{ $json.value }}\n\nReturn EXACTLY four lines, nothing else:\n\n🇮🇹 Def: [one to two sentence Italian definition at A2/B1, ≤20 words]\n🇬🇧 EN: [1–2 common English translations]\n🇮🇷 FA: [1–2 common Persian (Farsi) translations]\n🧩 Esempio: \"[everyday Italian sentence using the word]\"\n\nRules: Pick the most frequent general sense. No IPA, no extra lines. Do not translate the example sentence. If unknown/unclear, reply \"Non trovo la parola.\"\n",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        2256,
+        1056
+      ],
+      "id": "6ffa1143-927e-4a6c-a660-b11215927a07",
+      "name": "AI Agent1"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        2336,
+        1280
+      ],
+      "id": "f0e7817b-edcf-4ca8-8a45-2f460fe776b0",
+      "name": "Google Gemini Chat Model1",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "Q50URkwBWyzgTn0k",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.callback_query.data }}",
+                    "rightValue": "Save",
+                    "operator": {
+                      "type": "string",
+                      "operation": "startsWith"
+                    },
+                    "id": "e6546d6a-beae-4ec2-aa5f-86d10e06697c"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "80930476-9091-4a77-a78b-97d91241b5f4",
+                    "leftValue": "={{ $json.callback_query.data }}",
+                    "rightValue": "regen",
+                    "operator": {
+                      "type": "string",
+                      "operation": "startsWith"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "c5246f7a-81db-491d-8328-bf5af17537d2",
+                    "leftValue": "={{ $json.callback_query.data }}",
+                    "rightValue": "grade",
+                    "operator": {
+                      "type": "string",
+                      "operation": "startsWith"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        432,
+        32
+      ],
+      "id": "ea26e6e3-2c07-40fa-ad22-895aa69058d1",
+      "name": "Save | regen | grade"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Code').item.json.user_id }}",
+        "text": "=doc grade updated ✅ {{ $('Code').item.json.value }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1680,
+        240
+      ],
+      "id": "8da64257-89b8-4b97-b914-20bc91b21a18",
+      "name": "Send a text message4",
+      "webhookId": "e20bc8c5-8e1a-46e1-9a15-0b84267ce4c6",
+      "credentials": {
+        "telegramApi": {
+          "id": "BrHDcDevn0Qunnwi",
+          "name": "Telegram account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "collection": "expression",
+        "options": {},
+        "query": "={ \n  \"user_id\": \"{{ $json.user_id }}\",\n  \"value\": {\"$regex\": \"^{{ $json.value }}$\", \"$options\": \"i\"}\n}"
+      },
+      "type": "n8n-nodes-base.mongoDb",
+      "typeVersion": 1.2,
+      "position": [
+        880,
+        -240
+      ],
+      "id": "ee6af46b-285e-4a74-9680-c93e5fb9f573",
+      "name": "Find documents2",
+      "alwaysOutputData": true,
+      "credentials": {
+        "mongoDb": {
+          "id": "AHx6Vu0j6A0sxyHq",
+          "name": "MongoDB account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "53b21507-f105-40d4-846d-74f00d6232a2",
+              "leftValue": "={{ $json.value }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1104,
+        -240
+      ],
+      "id": "556dce25-6240-46df-ab36-21215c564e22",
+      "name": "If1",
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $json.user_id}}",
+        "text": "={{ $json.value }} already exists among your FlashCards 🧐",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1392,
+        -336
+      ],
+      "id": "a0946693-30db-4bc8-9373-f5c2c6b59c3d",
+      "name": "Send a text message5",
+      "webhookId": "13101bad-cf67-4fbe-8969-8a6c482dc7aa",
+      "credentials": {
+        "telegramApi": {
+          "id": "BrHDcDevn0Qunnwi",
+          "name": "Telegram account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "d9e1a0e8-4902-48e3-92a7-0a4dc52e3749",
+              "name": "user_id",
+              "value": "={{ $('Prepare expression data to store').item.json.user_id }}",
+              "type": "string"
+            },
+            {
+              "id": "fd7083b6-09a4-4874-b26f-c7229eced118",
+              "name": "value",
+              "value": "={{ $('Prepare expression data to store').item.json.value }}",
+              "type": "string"
+            },
+            {
+              "id": "b7ebd18b-920b-42ed-997e-34efb5e6234e",
+              "name": "created_at",
+              "value": "={{ $('Prepare expression data to store').item.json.created_at }}",
+              "type": "string"
+            },
+            {
+              "id": "f7a304ca-7384-4f81-987c-3aab85ea18e7",
+              "name": "last_sent_at",
+              "value": "={{ $('Prepare expression data to store').item.json.last_sent_at }}",
+              "type": "string"
+            },
+            {
+              "id": "aa0bd031-8e84-4a5e-be59-9f1418ba1f5a",
+              "name": "last_interaction_at",
+              "value": "={{ $('Prepare expression data to store').item.json.last_interaction_at }}",
+              "type": "string"
+            },
+            {
+              "id": "a2832b8f-5e78-4da7-bd50-a73421676065",
+              "name": "reps",
+              "value": "={{ $('Prepare expression data to store').item.json.reps }}",
+              "type": "number"
+            },
+            {
+              "id": "4fe4008e-e356-446b-8799-f01ac85aa5aa",
+              "name": "lapses",
+              "value": "={{ $('Prepare expression data to store').item.json.lapses }}",
+              "type": "number"
+            },
+            {
+              "id": "291b447a-b663-4454-b62d-8b29749bb84f",
+              "name": "success_streak",
+              "value": "={{ $('Prepare expression data to store').item.json.success_streak }}",
+              "type": "number"
+            },
+            {
+              "id": "291abc0f-0a42-474e-b106-9014c25cb610",
+              "name": "ewma_grade",
+              "value": "={{ $('Prepare expression data to store').item.json.ewma_grade }}",
+              "type": "number"
+            },
+            {
+              "id": "e79ae7cc-3da1-4c6a-a202-28f3888a58f0",
+              "name": "last_grade",
+              "value": "={{ $('Prepare expression data to store').item.json.last_grade }}",
+              "type": "number"
+            },
+            {
+              "id": "23ee5f5c-056e-49aa-af94-e50141cc1836",
+              "name": "pending_message_id",
+              "value": "={{ $('Prepare expression data to store').item.json.pending_message_id }}",
+              "type": "string"
+            },
+            {
+              "id": "d18ee6f0-1269-45f7-9fee-8caae84c9a0d",
+              "name": "status",
+              "value": "={{ $('Prepare expression data to store').item.json.status }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1392,
+        -48
+      ],
+      "id": "15e887a9-154c-41e6-9dcf-d488a41d00b4",
+      "name": "Prepare expression data to store2"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "37f2612b-5cdf-4d5a-aa59-1ef3dfab84e3",
+              "name": "=grade",
+              "value": "={{ $('Save | regen | grade').item.json.callback_query.data.split('-')[2] }}",
+              "type": "string"
+            },
+            {
+              "id": "131a84af-ef64-4052-8b00-7430ae7a89cd",
+              "name": "has_pending",
+              "value": "={{ false }}",
+              "type": "boolean"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        880,
+        144
+      ],
+      "id": "9e2f6a7b-78ec-453c-9a2b-84f1aeda9b63",
+      "name": "add grade|pending"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "d8cc130f-c5b5-451a-bc8d-56b577d23861",
+              "name": "iso15",
+              "value": "={{ new Date(Date.now()).toISOString() }}",
+              "type": "string"
+            },
+            {
+              "id": "fe9541a9-5251-4043-8eab-c25f0fa575f1",
+              "name": "user_id",
+              "value": "={{ $json.user_id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1392,
+        1168
+      ],
+      "id": "5e5bf688-6c06-4397-a733-5f0fc1cd0020",
+      "name": "add time"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  \"_id\": \"{{ $('Priority formula').item.json._id }}\",\n  \"user_id\": \"{{ $('Priority formula').item.json.user_id }}\",\n  \"value\": \"{{ $('Priority formula').item.json.value }}\",\n  \"last_sent_at\": \"{{ new Date(Date.now()).toISOString() }}\",\n \"last_push_at\": \"{{ new Date(Date.now()).toISOString() }}\", \n\"has_pending\": {{ true }},\n\"pending_message_id\": \"{{ $json.result.message_id }}\"\n}\n",
+        "includeOtherFields": "=",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2832,
+        1168
+      ],
+      "id": "784965ab-4e6c-40d8-8634-ca8c5adacbf8",
+      "name": "prepare grade updated messages"
+    },
+    {
+      "parameters": {
+        "operation": "sendChatAction",
+        "chatId": "={{ $json.message.from.id }}"
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1104,
+        1648
+      ],
+      "id": "5f20f5dd-1202-44a8-882d-1e8f91959a10",
+      "name": "Send a chat action",
+      "webhookId": "71dfbab6-205a-4d66-9e03-118c40fd2ae4",
+      "credentials": {
+        "telegramApi": {
+          "id": "BrHDcDevn0Qunnwi",
+          "name": "Telegram account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "4744f8e8-26b0-486a-8586-d05bec6a8011",
+              "leftValue": "={{ $json.message.text.length }}",
+              "rightValue": 10,
+              "operator": {
+                "type": "number",
+                "operation": "lt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        880,
+        1584
+      ],
+      "id": "7c04499f-5115-4784-85f1-79b7549779d5",
+      "name": "If<10 char"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('If<10 char').item.json.message.from.id }}",
+        "text": "=To add several words or expressions at once:  \n1. Start your message with /import  \n2. Write the list of words/expressions you want to save.  \nYou can separate them by new lines  Or use numbers, bullets, commas, or any delimiter.\n✅ Example:\n/import  \ndare una festa  \nspesa  \nprendere il treno ",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1104,
+        1312
+      ],
+      "id": "31f0e740-62b5-4059-af38-26a62ecd7b1e",
+      "name": "send list import format",
+      "webhookId": "7454823a-04c3-4f9f-bd19-34d2a0ffdc6e",
+      "credentials": {
+        "telegramApi": {
+          "id": "BrHDcDevn0Qunnwi",
+          "name": "Telegram account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=SYSTEM:\nYou are a strict parser for an Italian flashcard importer.\n\nTASK:\nGiven the raw user message below, extract a CLEAN list of Italian words/expressions intended for import. The user is instructed to start with `/import` and then provide a list that can be newline-, comma-, bullet-, or number-separated. Your job:\n- Accept only plausible Italian words/expressions (common phrases/locutions are fine).\n- Fix minor typos (orthography/accents/spaces).\n- Remove duplicates, leading/trailing spaces, and numbering/bullets/emoji.\n- Ignore everything before and including the first occurrence of \"/import\" (case-insensitive).\n- If nothing valid remains, or content is clearly not Italian, return success=false.\n\nOUTPUT FORMAT (STRICT JSON ONLY, NO PROSE):\n{\n  \"success\": <true|false>,\n  \"import_list\": \"<items joined by the delimiter>\",\n  \"delimiter\": \"|||~D~|||\",\n  \"log\": \"<short explanation only when success is false>\"\n}\n\nNOTES:\n- Use EXACTLY this delimiter for joining items: \"|||~D~|||\". Users will not type this; splitting on it is safe.\n- When success=true, \"log\" must be omitted.\n- When success=false, \"import_list\" must be an empty string \"\" and include a brief \"log\" (≤160 chars) suitable to show users.\n- Preserve natural casing; do minimal corrections only.\n- Do not include translation or examples; just the expressions themselves.\n\nRAW INPUT:\n{{ $('If<10 char').item.json.message.text }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        1328,
+        1536
+      ],
+      "id": "87f197b4-e470-4a60-9119-2e60a51bed75",
+      "name": "AI Agent2"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        1408,
+        1760
+      ],
+      "id": "a605d647-1230-49ac-aafd-39b998a7667f",
+      "name": "Google Gemini Chat Model2",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "Q50URkwBWyzgTn0k",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Robust JSON extractor for Gemini outputs (handles ```json ... ```, prose, etc.)\nfunction extractJson(raw) {\n  if (raw == null) return null;\n  let s = String(raw).trim();\n\n  // 1) Strip code fences like ```json ... ``` or ``` ... ```\n  const fenceMatch = s.match(/```(?:json)?\\s*([\\s\\S]*?)\\s*```/i);\n  if (fenceMatch) s = fenceMatch[1].trim();\n\n  // 2) Remove zero-width and non-printing chars that sometimes sneak in\n  s = s.replace(/[\\u200B-\\u200D\\uFEFF]/g, \"\");\n\n  // 3) If there's still extra text, grab from first '{' to last '}'\n  const first = s.indexOf(\"{\");\n  const last = s.lastIndexOf(\"}\");\n  if (first !== -1 && last !== -1 && last > first) {\n    s = s.slice(first, last + 1);\n  }\n\n  // 4) Parse\n  try {\n    return JSON.parse(s);\n  } catch (e) {\n    return null;\n  }\n}\n\nconst results = [];\nfor (const item of $input.all()) {\n  const RAW = item.json.output ?? item.json.text ?? item.json;\n  const parsed = extractJson(RAW);\n\n  if (!parsed) {\n    results.push({\n      json: {\n        success: false,\n        items: [],\n        log: \"Parser error: invalid JSON from model.\",\n        raw: RAW,\n      }\n    });\n    continue;\n  }\n\n  const success = !!parsed.success;\n  const delimiter = parsed.delimiter || \"|||~D~|||\"; // your shortened delimiter\n  const importList = typeof parsed.import_list === \"string\" ? parsed.import_list : \"\";\n  const items = success\n    ? importList.split(delimiter).map(s => s.trim()).filter(Boolean)\n    : [];\n\n  results.push({\n    json: {\n      success,\n      items,\n      log: success ? undefined : (parsed.log || \"Nessun elemento valido.\"),\n      raw: parsed,\n    }\n  });\n}\n\nreturn results;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1680,
+        1648
+      ],
+      "id": "8d8430d9-4247-44b1-8753-460af0543152",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "5db2a65c-65b7-4f26-a6f0-1d60fb1c04c2",
+              "leftValue": "={{ $json.success }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "5e09a47c-beb3-419b-8263-4478063f2e7d",
+              "leftValue": "={{ $json.items }}",
+              "rightValue": "",
+              "operator": {
+                "type": "array",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1968,
+        1648
+      ],
+      "id": "01eb99f3-ae09-48d9-9d06-4d21c5d5f389",
+      "name": "If having items"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "ac166e97-abaf-42ea-9663-8edd7c700cdb",
+              "leftValue": "={{ $json.raw }}",
+              "rightValue": "",
+              "operator": {
+                "type": "object",
+                "operation": "exists",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "3a1b6ca2-cdee-4a3c-8544-825f2d58a2a2",
+              "leftValue": "={{ $json.raw.success }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "false",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        2320,
+        1504
+      ],
+      "id": "869c9085-5d4a-4c8e-ad29-b1d8252fa9ba",
+      "name": "if raw message unsuccessful"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('If<10 char').item.json.message.from.id }}",
+        "text": "I was not able to correctly read the input message and insert the words/expressions into the system. Please control the format of the message and try again.",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        2608,
+        1600
+      ],
+      "id": "372dccbd-708f-4c0b-b422-31ef79081586",
+      "name": "send list unexpected message",
+      "webhookId": "7454823a-04c3-4f9f-bd19-34d2a0ffdc6e",
+      "credentials": {
+        "telegramApi": {
+          "id": "BrHDcDevn0Qunnwi",
+          "name": "Telegram account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('If<10 char').item.json.message.from.id }}",
+        "text": "=Import not successful:\n{{ $json.raw.log }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        2608,
+        1408
+      ],
+      "id": "16e27c5c-d5da-49b6-96a7-08eccd03bd27",
+      "name": "send unsuccessful log of llm",
+      "webhookId": "7454823a-04c3-4f9f-bd19-34d2a0ffdc6e",
+      "credentials": {
+        "telegramApi": {
+          "id": "BrHDcDevn0Qunnwi",
+          "name": "Telegram account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "collection": "expression",
+        "options": {},
+        "query": "={\n  \"user_id\": \"{{ $('If<10 char').item.json.message.from.id }}\",\n  \"value\": { \"$in\": {{ $json.items_norm.toJsonString() }} }\n}"
+      },
+      "type": "n8n-nodes-base.mongoDb",
+      "typeVersion": 1.2,
+      "position": [
+        2608,
+        1792
+      ],
+      "id": "d62835a6-b17d-4a5e-8b3e-64e13a3e6c31",
+      "name": "Find existing (bulk)",
+      "alwaysOutputData": true,
+      "credentials": {
+        "mongoDb": {
+          "id": "AHx6Vu0j6A0sxyHq",
+          "name": "MongoDB account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const base = $(\"Prepare import batch (bulk)\").first().json; // user_id, items_norm, norm_map, now\n// console.log(base)\n\n// Build Set of existing normalized values from Find results\nconst existing = new Set($input.all().map(i => String(i.json.value || '').trim()));\n// console.log(existing)\n\nconst docs = [];\nfor (const n of base.items_norm) {\n  if (existing.has(n)) continue; // skip duplicates\n  \n  docs.push({\n    json: {\n      user_id: base.user_id,\n      value: n,                 // original text\n      created_at: base.now,\n      last_sent_at: null,\n      last_interaction_at: null,\n      reps: 0,\n      lapses: 0,\n      success_streak: 0,\n      ewma_grade: 0.0,\n      last_grade: 0,\n      pending_message_id: null,\n      status: \"active\"\n    }\n  });\n}\n\nreturn docs; // returns [] if nothing new"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2832,
+        1792
+      ],
+      "id": "d1f94f72-2650-4bf4-969c-fe155caf51ac",
+      "name": "Build docs to insert (bulk)",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "operation": "insert",
+        "collection": "expression",
+        "fields": "user_id, value, created_at, last_sent_at, last_interaction_at, reps, lapses, success_streak, ewma_grade, last_grade, pending_message_id, status",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.mongoDb",
+      "typeVersion": 1.2,
+      "position": [
+        3056,
+        1792
+      ],
+      "id": "c2bc63fa-95fb-4b42-a5b7-5543a3d79b0f",
+      "name": "Insert new docs",
+      "alwaysOutputData": true,
+      "credentials": {
+        "mongoDb": {
+          "id": "AHx6Vu0j6A0sxyHq",
+          "name": "MongoDB account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "f255dffd-cc37-4ab5-806e-057cd9bbfc68",
+              "leftValue": "={{ $json.output }}",
+              "rightValue": "Def",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            },
+            {
+              "id": "c69e5868-07a6-4e78-9333-02a12c14efd2",
+              "leftValue": "={{ $json.output }}",
+              "rightValue": "FA",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1680,
+        592
+      ],
+      "id": "265b4198-8d92-424f-90b2-447cbc4eeee2",
+      "name": "if norm"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('If').item.json.id }}",
+        "text": "={{ $('AI Agent').item.json.output }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1968,
+        832
+      ],
+      "id": "415e5a38-2e7e-43c9-972d-698cf46b54d7",
+      "name": "Send a text message6",
+      "webhookId": "116bdf46-6d29-478b-a179-6cf81af9d838",
+      "credentials": {
+        "telegramApi": {
+          "id": "BrHDcDevn0Qunnwi",
+          "name": "Telegram account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "sendChatAction",
+        "chatId": "={{ $json.id }}"
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1104,
+        592
+      ],
+      "id": "61fe0d75-b3e7-4777-b34f-fd21d760167c",
+      "name": "Send a chat action1",
+      "webhookId": "d9ff09b6-3a3d-4961-859a-b7abca5562f9",
+      "credentials": {
+        "telegramApi": {
+          "id": "BrHDcDevn0Qunnwi",
+          "name": "Telegram account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "\nconst userId = $('If<10 char').first().json.message.from.id; // adjust if needed\nconst now = new Date().toISOString();\nconst arr = $input.first().json.items\n\nfunction norm(s) {\n  return String(s)\n    .normalize('NFKC')\n    .toLowerCase()\n    .replace(/\\s+/g, ' ')\n    .trim();\n}\n\nconst norm_map = {};\nfor (const v of arr) {\n  const n = norm(v);\n  if (!n) continue;\n  if (!(n in norm_map)) norm_map[n] = String(v).trim();\n}\n\nreturn [{\n  json: {\n    user_id: String(userId),\n    items_norm: Object.keys(norm_map),\n    norm_map,\n    now\n  }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2320,
+        1792
+      ],
+      "id": "7af45d6b-58b2-46fa-8e89-5d8951232571",
+      "name": "Prepare import batch (bulk)"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Loop over input items and add a new field called 'myNewField' to the JSON of each one\nconst inserted = []\nfor (const item of $input.all()) {\n  if (item.json.value !== null) {\n    inserted.push(item.json.value)\n  }\n  \n}\n\nreturn { \"inserted\": inserted}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3280,
+        1792
+      ],
+      "id": "fc423faf-5b93-482e-90a2-ab43cab5eb2c",
+      "name": "Code in JavaScript1"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('If<10 char').first().json.message.from.id }}",
+        "text": "={{ Array.isArray($json.inserted) && $json.inserted.length > 0\n    ? $json.inserted.length + ' flashCards saved:\\n' + $json.inserted.join('\\n')\n    : 'Either all items were already present or no new item was added' }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        3504,
+        1792
+      ],
+      "id": "c8f57772-6fe7-4a58-adbc-f9b4e44520fa",
+      "name": "Send a text message7",
+      "webhookId": "e2394963-fa4a-4f11-b7fb-90bd7e95e8b3",
+      "credentials": {
+        "telegramApi": {
+          "id": "BrHDcDevn0Qunnwi",
+          "name": "Telegram account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "aggregate",
+        "collection": "expression",
+        "query": "=[\n  {\n    \"$match\": { \"user_id\": \"{{ $('Telegram Trigger').item.json.message.from.id }}\" }\n  },\n  {\n    \"$project\": { \"value\": 1, \"_id\": 0 }\n  }\n]"
+      },
+      "type": "n8n-nodes-base.mongoDb",
+      "typeVersion": 1.2,
+      "position": [
+        880,
+        1936
+      ],
+      "id": "e3c2b020-00d2-41f8-b964-fd753cd86a43",
+      "name": "Aggregate documents",
+      "alwaysOutputData": true,
+      "credentials": {
+        "mongoDb": {
+          "id": "AHx6Vu0j6A0sxyHq",
+          "name": "MongoDB account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Loop over input items and add a new field called 'myNewField' to the JSON of each one\nconst items_list = $input.all().map(i => i.json.value)\n\nreturn [{ json: \n            { word_list: items_list }\n        }]"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1104,
+        1936
+      ],
+      "id": "8c0a5c62-789a-4b09-8c9f-ebd0dcda37c6",
+      "name": "Code in JavaScript2"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').first().json.message.chat.id }}",
+        "text": "={{ Array.isArray($json.word_list) && $json.word_list.length > 0\n    ? $json.word_list.length + ' flashCards in your database:\\n' + $json.word_list.join('\\n')\n    : 'Either all items were already present or no new item was added' }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1392,
+        1936
+      ],
+      "id": "13254871-977c-444d-bda6-095c43072dd7",
+      "name": "Send a text message8",
+      "webhookId": "e2394963-fa4a-4f11-b7fb-90bd7e95e8b3",
+      "credentials": {
+        "telegramApi": {
+          "id": "BrHDcDevn0Qunnwi",
+          "name": "Telegram account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.message.text }}",
+                    "rightValue": "/start",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "cc4f1c52-fd59-49d5-aeaf-01a0ee370e21"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "6ded0808-709c-4260-8cdc-3f2db3720b57",
+                    "leftValue": "={{ $json.message.text }}",
+                    "rightValue": "/get",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "f7b65fa7-1f84-4ed9-8312-a71e34782af0",
+                    "leftValue": "={{ $json.message.text }}",
+                    "rightValue": "/import",
+                    "operator": {
+                      "type": "string",
+                      "operation": "startsWith"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "7d76966c-f4fc-4ab9-b641-2b88650bc4df",
+                    "leftValue": "={{ $json.message.text }}",
+                    "rightValue": "/list_my_flashcards",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "4780938e-38a0-456f-87c7-f19fa1d94aa1",
+                    "leftValue": "={{ $json.message.text }}",
+                    "rightValue": "/story",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        656,
+        1456
+      ],
+      "id": "59d533b7-6e64-43dd-add5-4528826177f8",
+      "name": "start/get/import/list/story"
+    },
+    {
+      "parameters": {
+        "operation": "aggregate",
+        "collection": "expression",
+        "query": "=[\n  {\n    \"$match\": { \"user_id\": \"{{ $('Telegram Trigger').item.json.message.from.id }}\" }\n  },\n  {\n    \"$project\": { \"value\": 1, \"_id\": 0 }\n  }\n]"
+      },
+      "type": "n8n-nodes-base.mongoDb",
+      "typeVersion": 1.2,
+      "position": [
+        1104,
+        2128
+      ],
+      "id": "a7f711d2-dda1-40ec-8e56-81196b7a2dfc",
+      "name": "Aggregate documents1",
+      "alwaysOutputData": true,
+      "credentials": {
+        "mongoDb": {
+          "id": "AHx6Vu0j6A0sxyHq",
+          "name": "MongoDB account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Loop over input items and add a new field called 'myNewField' to the JSON of each one\nconst items_list = $input.all().map(i => i.json.value);\n\nlet final_list;\n\nif (items_list.length <= 30) {\n  final_list = items_list;\n} else {\n  // Shuffle & keep 30\n  function shuffle(array) {\n    for (let i = array.length - 1; i > 0; i--) {\n      const j = Math.floor(Math.random() * (i + 1));\n      [array[i], array[j]] = [array[j], array[i]];\n    }\n    return array;\n  }\n  final_list = shuffle([...items_list]).slice(0, 30);\n}\n\nreturn [\n  {\n    json: {\n      word_list: final_list\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1392,
+        2128
+      ],
+      "id": "ea1773c4-ac9e-49f7-9094-69806fa91cbc",
+      "name": "Code in JavaScript3"
+    },
+    {
+      "parameters": {
+        "operation": "sendChatAction",
+        "chatId": "={{ $('Telegram Trigger').first().json.message.from.id }}"
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1680,
+        2128
+      ],
+      "id": "49f7e796-8638-4659-b2dd-53966658af89",
+      "name": "Send a chat action2",
+      "webhookId": "71dfbab6-205a-4d66-9e03-118c40fd2ae4",
+      "credentials": {
+        "telegramApi": {
+          "id": "BrHDcDevn0Qunnwi",
+          "name": "Telegram account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are an assistant for Italian language learners at level A2–B1.\n\nTask:\n- Given this list of words: [{{ $('Code in JavaScript3').item.json.word_list }}]\n\n\n- Write a short story in **Italian** (8–12 sentences), grouped into short paragraphs.\n- Use as many words from the list as you can, adapting them slightly (plural/singular, verb tense, gender) if needed.\n- The story should be engaging, natural, and easy to follow for A2/B1 learners.\n\nOutput format for Telegram:\n- Output each paragraph and its translation as **separate messages**.\n- Use this structure:\n  MSG1: Italian paragraph 1  \n  MSG2: 🇬🇧 <tg-spoiler>English translation of paragraph 1</tg-spoiler>  \n  MSG3: Italian paragraph 2  \n  MSG4: 🇬🇧 <tg-spoiler>English translation of paragraph 2</tg-spoiler>  \n  ...continue until the story ends.  \n\nRules:\n- Do NOT explain vocabulary, just use it in context.  \n- Keep the translations faithful and simple.  \n- Ensure Telegram spoiler markup is correct (HTML parse mode).  \n- Do not merge messages; keep the `MSG#:` labels so they can be split programmatically.  \n",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        1904,
+        2128
+      ],
+      "id": "b6d6d7f2-ff2d-4ded-a3aa-293f2a4bad34",
+      "name": "AI Agent3"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        1984,
+        2352
+      ],
+      "id": "a17593fb-bb61-4906-9bf8-1d00398882df",
+      "name": "Google Gemini Chat Model3",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "Q50URkwBWyzgTn0k",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').first().json.message.from.id }}",
+        "text": "={{ $json.text }}",
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "HTML"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        2608,
+        2128
+      ],
+      "id": "9385250f-31d5-45c8-bf50-a190ce9e047c",
+      "name": "Send a text message9",
+      "webhookId": "17ad084d-36b8-430d-907f-de378d8acdef",
+      "credentials": {
+        "telegramApi": {
+          "id": "BrHDcDevn0Qunnwi",
+          "name": "Telegram account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "\n// Get the raw LLM output (adjust if your field is different)\nfunction markdownToHtml(text) {\n  // replace **bold** with <b>bold</b>\n  return text.replace(/\\*\\*(.+?)\\*\\*/g, '<b>$1</b>');\n}\n\nconst raw = ($input.first().json.output ?? '').trim();\n\nif (!raw) {\n  return [{ json: { error: 'Empty LLM output' } }];\n}\n\n// Split on \"MSG<number>:\" headers\nconst parts = raw.split(/(?=MSG\\d+:)/g);\n\nconst items = [];\n\nfor (const part of parts) {\n  const match = part.match(/^MSG(\\d+):\\s*([\\s\\S]*)$/);\n  if (match) {\n    const index = Number(match[1]);\n    const text = match[2].trim();\n    if (text) {\n      items.push({\n        msg_index: index,\n        text\n      });\n    }\n  }\n}\n\n// Sort just in case and return as multiple items\nitems.sort((a, b) => a.msg_index - b.msg_index);\n\nreturn items.map(({ msg_index, text }) => ({\n  json: { msg_index, text: markdownToHtml(text) }\n}));\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2320,
+        2128
+      ],
+      "id": "aa28e556-f9d4-406d-bb37-fef6e98cf2f5",
+      "name": "Code in JavaScript4"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').first().json.message.from.id }}",
+        "text": "Working on it ... might take some time...",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        880,
+        2128
+      ],
+      "id": "5ad06d18-27e5-4024-a3d0-972bb7bcda5f",
+      "name": "Send a text message10",
+      "webhookId": "f4bdea87-7359-4346-8f3f-53bc06a19ea9",
+      "credentials": {
+        "telegramApi": {
+          "id": "BrHDcDevn0Qunnwi",
+          "name": "Telegram account 3"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "message | callback",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "message | callback": {
+      "main": [
+        [
+          {
+            "node": "Save | regen | grade",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "command or text",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insert documents": {
+      "main": [
+        [
+          {
+            "node": "If inserted",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If inserted": {
+      "main": [
+        [
+          {
+            "node": "Send a text message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare expression data to store": {
+      "main": [
+        [
+          {
+            "node": "Find documents2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "prepare user data to store": {
+      "main": [
+        [
+          {
+            "node": "Find and update documents",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Find graded expression": {
+      "main": [
+        [
+          {
+            "node": "add grade|pending",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "update expression's grades",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "update expression's grades": {
+      "main": [
+        [
+          {
+            "node": "Send a text message4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "if norm",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields2": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Send a chat action1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "command or text": {
+      "main": [
+        [
+          {
+            "node": "start/get/import/list/story",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "start message": {
+      "main": [
+        []
+      ]
+    },
+    "Find documents": {
+      "main": [
+        [
+          {
+            "node": "if user in db",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "if user in db": {
+      "main": [
+        [
+          {
+            "node": "add time",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "no memory",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Priority formula": {
+      "main": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Find and update user data document": {
+      "main": [
+        [
+          {
+            "node": "Send a text message2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Find and update the word document": {
+      "main": [
+        [
+          {
+            "node": "Send a text message3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send 'Your picked expression'": {
+      "main": [
+        [
+          {
+            "node": "prepare grade updated messages",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Find documents1": {
+      "main": [
+        [
+          {
+            "node": "Priority formula",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent1": {
+      "main": [
+        [
+          {
+            "node": "Send 'Your picked expression'",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Save | regen | grade": {
+      "main": [
+        [
+          {
+            "node": "Prepare expression data to store",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "prepare user data to store",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Find graded expression",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Find documents2": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "Send a text message5",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Prepare expression data to store2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare expression data to store2": {
+      "main": [
+        [
+          {
+            "node": "Insert documents",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "add grade|pending": {
+      "main": [
+        [
+          {
+            "node": "Update user has_pending=false",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "add time": {
+      "main": [
+        [
+          {
+            "node": "Find documents1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "prepare grade updated messages": {
+      "main": [
+        [
+          {
+            "node": "Find and update user data document",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Find and update the word document",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a chat action": {
+      "main": [
+        [
+          {
+            "node": "AI Agent2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If<10 char": {
+      "main": [
+        [
+          {
+            "node": "send list import format",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send a chat action",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent2": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent2",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "If having items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If having items": {
+      "main": [
+        [
+          {
+            "node": "Prepare import batch (bulk)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "if raw message unsuccessful",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "if raw message unsuccessful": {
+      "main": [
+        [
+          {
+            "node": "send unsuccessful log of llm",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "send list unexpected message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Find existing (bulk)": {
+      "main": [
+        [
+          {
+            "node": "Build docs to insert (bulk)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build docs to insert (bulk)": {
+      "main": [
+        [
+          {
+            "node": "Insert new docs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insert new docs": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "if norm": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send a text message6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a chat action1": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare import batch (bulk)": {
+      "main": [
+        [
+          {
+            "node": "Find existing (bulk)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        [
+          {
+            "node": "Send a text message7",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate documents": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript2": {
+      "main": [
+        [
+          {
+            "node": "Send a text message8",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "start/get/import/list/story": {
+      "main": [
+        [
+          {
+            "node": "start message",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Find documents",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "If<10 char",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Aggregate documents",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send a text message10",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate documents1": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript3": {
+      "main": [
+        [
+          {
+            "node": "Send a chat action2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a chat action2": {
+      "main": [
+        [
+          {
+            "node": "AI Agent3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent3": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model3": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent3",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a text message9": {
+      "main": [
+        []
+      ]
+    },
+    "Code in JavaScript4": {
+      "main": [
+        [
+          {
+            "node": "Send a text message9",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a text message10": {
+      "main": [
+        [
+          {
+            "node": "Aggregate documents1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "e2839c3de7d0fee0161b153399a4168159092a93f8302581c0e1c13ab92eacde"
+  }
+}
