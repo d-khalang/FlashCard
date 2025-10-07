@@ -1,2 +1,2 @@
 # FlashCard
-N8N workflows creating a dynamic and LLM powered flash card system, integrating telegram bot and MongoDB.
+N8N workflows for a dynamic and LLM-powered flash card system, integrating a Telegram bot and MongoDB.
